@@ -1,4 +1,4 @@
-package bizmodel
+package alarmmodel
 
 import (
 	"encoding/json"
