@@ -48,8 +48,14 @@ type (
 		RoleModuleBuilder() IRoleModuleBuilder
 
 		TeamModuleBuilder() ITeamModuleBuilder
+
+		AlarmHistoryModuleBuilder() IAlarmHistoryModuleBuilder
 	}
 )
+
+func (p *paramsBuilder) AlarmHistoryModuleBuilder() IAlarmHistoryModuleBuilder {
+	return &alarmHistoryModuleBuilder{ctx: p.ctx}
+}
 
 func (p *paramsBuilder) TeamModuleBuilder() ITeamModuleBuilder {
 	return &teamModuleBuilder{ctx: p.ctx}
