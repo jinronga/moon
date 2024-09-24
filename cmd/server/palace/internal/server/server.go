@@ -49,6 +49,7 @@ type Server struct {
 	rpcSrv        *grpc.Server
 	httpSrv       *http.Server
 	strategyWatch *StrategyWatch
+	alertWatch    *AlertWatch
 }
 
 // GetRPCServer 获取rpc server
@@ -170,5 +171,6 @@ func RegisterService(
 		rpcSrv:        rpcSrv,
 		httpSrv:       httpSrv,
 		strategyWatch: newStrategyWatch(c, data, alertService),
+		alertWatch:    newAlertWatch(c, data, alertService),
 	}
 }
