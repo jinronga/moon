@@ -26,6 +26,12 @@ type userRepositoryImpl struct {
 	data *data.Data
 }
 
+func (l *userRepositoryImpl) GetUserByEmailOrPhone(ctx context.Context, emailOrPhone string) (*model.SysUser, error) {
+	userQuery := query.Use(l.data.GetMainDB(ctx)).SysUser
+	userCtxQuery := userQuery.WithContext(ctx).Or(userQuery.Email.Eq(emailOrPhone), userQuery.Phone.Eq(emailOrPhone))
+	return userCtxQuery.First()
+}
+
 func (l *userRepositoryImpl) GetByEmail(ctx context.Context, email string) (*model.SysUser, error) {
 	if err := types.CheckEmail(email); err != nil {
 		return nil, err
