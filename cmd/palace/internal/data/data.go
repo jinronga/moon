@@ -158,6 +158,18 @@ func (d *Data) FirstServerConn(serverType vobj.ServerType) (*bo.Server, bool) {
 	return nil, false
 }
 
+func (d *Data) ServerConList(serverType vobj.ServerType) (map[string]*bo.Server, bool) {
+	switch serverType {
+	case vobj.ServerTypeRabbit:
+		return d.rabbitConn.List(), true
+	case vobj.ServerTypeHouyi:
+		return d.houyiConn.List(), true
+	case vobj.ServerTypeLaurel:
+		return d.laurelConn.List(), true
+	}
+	return nil, false
+}
+
 func (d *Data) GetCache() cache.Cache {
 	return d.cache
 }

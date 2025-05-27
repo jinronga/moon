@@ -6,6 +6,7 @@ import (
 	"github.com/aide-family/moon/cmd/palace/internal/biz/bo"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/do"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/repository"
+	"github.com/aide-family/moon/cmd/palace/internal/service/build"
 	"github.com/aide-family/moon/pkg/merr"
 )
 
@@ -17,6 +18,7 @@ func NewTeamStrategyMetricBiz(
 	noticeGroupRepo repository.TeamNotice,
 	datasourceRepo repository.TeamDatasourceMetric,
 	transaction repository.Transaction,
+	houyiRepo repository.Houyi,
 ) *TeamStrategyMetric {
 	return &TeamStrategyMetric{
 		teamStrategyRepo:            teamStrategyRepo,
@@ -26,10 +28,12 @@ func NewTeamStrategyMetricBiz(
 		noticeGroupRepo:             noticeGroupRepo,
 		datasourceRepo:              datasourceRepo,
 		transaction:                 transaction,
+		houyiRepo:                   houyiRepo,
 	}
 }
 
 type TeamStrategyMetric struct {
+	teamStrategyGroupRepo       repository.TeamStrategyGroup
 	teamStrategyRepo            repository.TeamStrategy
 	teamStrategyMetricRepo      repository.TeamStrategyMetric
 	teamStrategyMetricLevelRepo repository.TeamStrategyMetricLevel
@@ -37,8 +41,8 @@ type TeamStrategyMetric struct {
 	noticeGroupRepo             repository.TeamNotice
 	datasourceRepo              repository.TeamDatasourceMetric
 	transaction                 repository.Transaction
+	houyiRepo                   repository.Houyi
 }
-
 func (t *TeamStrategyMetric) SaveTeamMetricStrategy(ctx context.Context, params *bo.SaveTeamMetricStrategyParams) error {
 	strategyDo, err := t.teamStrategyRepo.Get(ctx, params.StrategyID)
 	if err != nil {
@@ -133,4 +137,17 @@ func (t *TeamStrategyMetric) DeleteTeamMetricStrategyLevel(ctx context.Context, 
 
 func (t *TeamStrategyMetric) GetTeamMetricStrategyLevel(ctx context.Context, strategyMetricLevelID uint32) (do.StrategyMetricRule, error) {
 	return t.teamStrategyMetricLevelRepo.Get(ctx, strategyMetricLevelID)
+}
+
+
+func (t *TeamStrategyMetric) pushStrategy(ctx context.Context, strategy *do.PushStrategyAll) error {
+	pushClient, ok := t.houyiRepo.PushStrategy()
+
+	if !ok {
+		return merr.ErrorBadRequest("push strategy service is not running")
+	}
+	if _, err := pushClient.PushStrategy(ctx, build.ToStrategyPushStrategyItem(strategy)); err != nil {
+		return err
+	}
+	return nil
 }

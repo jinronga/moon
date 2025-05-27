@@ -10,6 +10,7 @@ import (
 type Houyi interface {
 	Sync() (HouyiSyncClient, bool)
 	Query() (HouyiQueryClient, bool)
+	PushStrategy() (HouyiPushClient, bool)
 }
 
 type HouyiSyncClient interface {
@@ -18,4 +19,8 @@ type HouyiSyncClient interface {
 
 type HouyiQueryClient interface {
 	MetricDatasourceQuery(ctx context.Context, req *houyiv1.MetricDatasourceQueryRequest) (*common.MetricDatasourceQueryReply, error)
+}
+
+type HouyiPushClient interface {
+	PushStrategy(ctx context.Context, req *houyiv1.PushStrategyRequest) (*houyiv1.PushStrategyReply, error)
 }

@@ -59,3 +59,18 @@ type StrategyMetricRuleLabelNotice interface {
 	GetLabelValue() string
 	GetNotices() []NoticeGroup
 }
+
+type PushStrategy interface {
+	GetStrategyMetric() []*StrategyMetric
+}
+
+type PushStrategyAll struct {
+	StrategyMetric []StrategyMetric
+}
+
+func (p *PushStrategyAll) GetStrategyMetric() []StrategyMetric {
+	if p == nil {
+		return nil
+	}
+	return p.StrategyMetric
+}

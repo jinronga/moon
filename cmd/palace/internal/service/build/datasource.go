@@ -5,6 +5,7 @@ import (
 	"github.com/aide-family/moon/cmd/palace/internal/biz/do"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/vobj"
 	"github.com/aide-family/moon/pkg/api/common"
+	houyicommon "github.com/aide-family/moon/pkg/api/houyi/common"
 	"github.com/aide-family/moon/pkg/api/palace"
 	palacecommon "github.com/aide-family/moon/pkg/api/palace/common"
 	"github.com/aide-family/moon/pkg/util/kv"
@@ -118,6 +119,13 @@ func ToTeamMetricDatasourceItem(item do.DatasourceMetric) *palacecommon.TeamMetr
 
 func ToTeamMetricDatasourceItems(items []do.DatasourceMetric) []*palacecommon.TeamMetricDatasourceItem {
 	return slices.Map(items, ToTeamMetricDatasourceItem)
+}
+
+func ToPushMetricDatasourceItem(item do.DatasourceMetric) *houyicommon.MetricDatasourceItem {
+	if validate.IsNil(item) {
+		return nil
+	}
+	return &houyicommon.MetricDatasourceItem{}
 }
 
 func ToBatchSaveTeamMetricDatasourceMetadataRequest(req *palace.SyncMetadataRequest) *bo.BatchSaveTeamMetricDatasourceMetadata {

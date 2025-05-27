@@ -4,6 +4,8 @@ import (
 	"github.com/aide-family/moon/cmd/palace/internal/biz/bo"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/do"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/vobj"
+	houyicommon "github.com/aide-family/moon/pkg/api/houyi/common"
+	houyiv1 "github.com/aide-family/moon/pkg/api/houyi/v1"
 	"github.com/aide-family/moon/pkg/api/palace"
 	"github.com/aide-family/moon/pkg/api/palace/common"
 	"github.com/aide-family/moon/pkg/util/cnst"
@@ -210,6 +212,73 @@ func ToTeamMetricStrategyItem(strategy do.StrategyMetric) *common.TeamStrategyMe
 	}
 }
 
+func ToTeamMetricPushStrategyItem(strategy do.StrategyMetric) *houyicommon.MetricStrategyItem {
+	if validate.IsNil(strategy) {
+		panic("ToTeamMetricPushStrategyItem do.StrategyMetric is nil")
+	}
+
+	strategy.GetDatasourceList()
+	item := &houyicommon.MetricStrategyItem{
+		Expr:           strategy.GetExpr(),
+		Name:           strategy.GetStrategy().GetName(),
+		Datasource:     slices.Map(strategy.GetDatasourceList(), ToDatasourceMetricDatasourceItem),
+		Annotations:    strategy.GetAnnotations(),
+		Labels:         strategy.GetLabels().ToMap(),
+		StrategyId:     strategy.GetID(),
+		Rules:          slices.Map(strategy.GetRules(), ToTeamStrategyMetricRuleMetricRuleItem),
+		ReceiverRoutes: nil,
+	}
+
+	team := strategy.GetTeam()
+
+	if validate.IsNotNil(team) {
+		item.Team = &houyicommon.TeamItem{
+			TeamId: team.GetID(),
+			Uuid:   team.GetUUID().String(),
+		}
+	}
+
+	return item
+}
+
+func ToDatasourceMetricDatasourceItem(datasource do.DatasourceMetric) *houyicommon.MetricStrategyItem_MetricDatasourceItem {
+	if validate.IsNil(datasource) {
+		return nil
+	}
+	return &houyicommon.MetricStrategyItem_MetricDatasourceItem{
+		Driver: houyicommon.MetricDatasourceDriver(datasource.GetDriver()),
+		Id:     datasource.GetID(),
+	}
+}
+
+func ToTeamStrategyMetricRuleMetricRuleItem(rule do.StrategyMetricRule) *houyicommon.MetricStrategyItem_MetricRuleItem {
+	if validate.IsNil(rule) {
+		return nil
+	}
+	rule.GetLabelNotices()
+	return &houyicommon.MetricStrategyItem_MetricRuleItem{
+		StrategyId:   rule.GetStrategyMetric().GetStrategyID(),
+		LevelId:      rule.GetLevelID(),
+		SampleMode:   houyicommon.SampleMode(rule.GetSampleMode()),
+		Count:        rule.GetTotal(),
+		Condition:    houyicommon.MetricStrategyItem_Condition(rule.GetCondition()),
+		Values:       rule.GetValues(),
+		LabelNotices: slices.Map(rule.GetLabelNotices(), ToMetricRuleLabelNoticeLabelNoticesItem),
+		Enable:       rule.GetStatus().IsEnable(),
+	}
+}
+
+func ToMetricRuleLabelNoticeLabelNoticesItem(notice do.StrategyMetricRuleLabelNotice) *houyicommon.MetricStrategyItem_LabelNotices {
+	if validate.IsNil(notice) {
+		return nil
+	}
+
+	return &houyicommon.MetricStrategyItem_LabelNotices{
+		Key:   notice.GetLabelKey(),
+		Value: notice.GetLabelValue(),
+	}
+}
+
 func ToKeyValueItems(labels []*kv.KV) []*common.KeyValueItem {
 	return slices.Map(labels, ToKeyValueItem)
 }
@@ -296,4 +365,17 @@ func ToSubscribeTeamStrategyItem(subscriber do.TeamStrategySubscriber) *common.S
 		Strategy:      ToTeamStrategyItem(subscriber.GetStrategy()),
 		SubscribeTime: timex.Format(subscriber.GetCreatedAt()),
 	}
+}
+
+func ToStrategyPushStrategyItem(strategyAll *do.PushStrategyAll) *houyiv1.PushStrategyRequest {
+	if validate.IsNil(strategyAll) {
+		return nil
+	}
+
+	res := &houyiv1.PushStrategyRequest{
+		Metric: &houyiv1.MetricStrategyRequest{
+			Strategies: slices.Map(strategyAll.GetStrategyMetric(), ToTeamMetricPushStrategyItem),
+		},
+	}
+	return res
 }
