@@ -43,6 +43,7 @@ type TeamStrategyMetric struct {
 	transaction                 repository.Transaction
 	houyiRepo                   repository.Houyi
 }
+
 func (t *TeamStrategyMetric) SaveTeamMetricStrategy(ctx context.Context, params *bo.SaveTeamMetricStrategyParams) error {
 	strategyDo, err := t.teamStrategyRepo.Get(ctx, params.StrategyID)
 	if err != nil {
@@ -131,8 +132,12 @@ func (t *TeamStrategyMetric) UpdateTeamMetricStrategyLevelStatus(ctx context.Con
 	return t.teamStrategyMetricLevelRepo.UpdateStatus(ctx, params)
 }
 
-func (t *TeamStrategyMetric) DeleteTeamMetricStrategyLevel(ctx context.Context, params *bo.DeleteTeamMetricStrategyLevelParams) error {
-	return t.teamStrategyMetricLevelRepo.Delete(ctx, params.StrategyMetricLevelID)
+func (t *TeamStrategyMetric) DeleteTeamMetricStrategyLevel(ctx context.Context, strategyMetricLevelID uint32) error {
+	return t.teamStrategyMetricLevelRepo.Delete(ctx, strategyMetricLevelID)
+}
+
+func (t *TeamStrategyMetric) GetTeamMetricStrategyLevel(ctx context.Context, strategyMetricLevelID uint32) (do.StrategyMetricRule, error) {
+	return t.teamStrategyMetricLevelRepo.Get(ctx, strategyMetricLevelID)
 }
 
 func (t *TeamStrategyMetric) pushStrategy(ctx context.Context, strategy *do.PushStrategyAll) error {
