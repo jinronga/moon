@@ -1,6 +1,8 @@
 package build
 
 import (
+	"fmt"
+
 	"github.com/aide-family/moon/cmd/palace/internal/biz/bo"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/do"
 	"github.com/aide-family/moon/cmd/palace/internal/biz/vobj"
@@ -286,14 +288,16 @@ func ToTeamMetricPushStrategyItem(strategy do.StrategyMetric) *houyicommon.Metri
 
 	strategy.GetDatasourceList()
 	item := &houyicommon.MetricStrategyItem{
-		Expr:           strategy.GetExpr(),
-		Name:           strategy.GetStrategy().GetName(),
-		Datasource:     slices.Map(strategy.GetDatasourceList(), ToDatasourceMetricDatasourceItem),
-		Annotations:    strategy.GetAnnotations(),
-		Labels:         strategy.GetLabels().ToMap(),
-		StrategyId:     strategy.GetID(),
-		Rules:          slices.Map(strategy.GetRules(), ToTeamStrategyMetricRuleMetricRuleItem),
-		ReceiverRoutes: nil,
+		Expr:        strategy.GetExpr(),
+		Name:        strategy.GetStrategy().GetName(),
+		Datasource:  slices.Map(strategy.GetDatasourceList(), ToDatasourceMetricDatasourceItem),
+		Annotations: strategy.GetAnnotations(),
+		Labels:      strategy.GetLabels().ToMap(),
+		StrategyId:  strategy.GetID(),
+		Rules:       slices.Map(strategy.GetRules(), ToTeamStrategyMetricRuleMetricRuleItem),
+		ReceiverRoutes: slices.Map(strategy.GetStrategy().GetNotices(), func(notice do.NoticeGroup) string {
+			return fmt.Sprintf("%d:%d", notice.GetTeam().GetID(), notice.GetID())
+		}),
 	}
 
 	team := strategy.GetTeam()
@@ -343,6 +347,9 @@ func ToMetricRuleLabelNoticeLabelNoticesItem(notice do.StrategyMetricRuleLabelNo
 	return &houyicommon.MetricStrategyItem_LabelNotices{
 		Key:   notice.GetLabelKey(),
 		Value: notice.GetLabelValue(),
+		ReceiverRoutes: slices.Map(notice.GetNotices(), func(notice do.NoticeGroup) string {
+			return fmt.Sprintf("%d:%d", notice.GetTeam().GetID(), notice.GetID())
+		}),
 	}
 }
 
