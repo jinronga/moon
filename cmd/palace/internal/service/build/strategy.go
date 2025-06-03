@@ -228,7 +228,6 @@ func ToTeamMetricPushStrategyItem(strategy do.StrategyMetric) *houyicommon.Metri
 	if validate.IsNil(strategy) {
 		panic("ToTeamMetricPushStrategyItem do.StrategyMetric is nil")
 	}
-
 	strategy.GetDatasourceList()
 	item := &houyicommon.MetricStrategyItem{
 		Expr:        strategy.GetExpr(),
@@ -374,7 +373,7 @@ func ToSubscribeTeamStrategyItem(subscriber do.TeamStrategySubscriber) *common.S
 	}
 }
 
-func ToStrategyPushStrategyItem(strategyAll *do.PushStrategyAll) *houyiv1.PushStrategyRequest {
+func ToStrategyPushStrategyItem(strategyAll *do.PushStrategyInfo) *houyiv1.PushStrategyRequest {
 	if validate.IsNil(strategyAll) {
 		return nil
 	}

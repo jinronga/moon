@@ -99,7 +99,7 @@ func (s *houyiPushClient) PushStrategy(ctx context.Context, req *houyiv1.PushStr
 		}
 	}
 	return &houyiv1.PushStrategyReply{
-		Code:    200,
+		Code:    0,
 		Message: "success",
 	}, nil
 }

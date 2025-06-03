@@ -140,7 +140,7 @@ func (t *TeamStrategyMetric) GetTeamMetricStrategyLevel(ctx context.Context, str
 	return t.teamStrategyMetricLevelRepo.Get(ctx, strategyMetricLevelID)
 }
 
-func (t *TeamStrategyMetric) pushStrategy(ctx context.Context, strategy *do.PushStrategyAll) error {
+func (t *TeamStrategyMetric) pushStrategy(ctx context.Context, strategy *do.PushStrategyInfo) error {
 	pushClient, ok := t.houyiRepo.PushStrategy()
 
 	if !ok {
